@@ -1,0 +1,15 @@
+{
+  "name": "screenshot-website",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "author": "Juan Francisco Kurucz",
+  "license": "ISC",
+  "dependencies": {
+    "electron": "^4.0.4",
+    "pdf-poppler": "^0.2.1"
+  }
+}
