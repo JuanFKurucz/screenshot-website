@@ -1,6 +1,5 @@
 const { app, BrowserWindow } = require("electron");
 const fs = require("fs");
-const path = require('path');
 const pdf = require('pdf-poppler');
 
 let win;
@@ -28,6 +27,13 @@ const convertPdf = (file,url) => {
 };
 
 const start = () => {
+  if (!fs.existsSync(__dirname+"/tmp/")) {
+    fs.mkdirSync(__dirname+"/tmp/");
+  }
+  if (!fs.existsSync(__dirname+"/output/")) {
+    fs.mkdirSync(__dirname+"/output/");
+  }
+
   const data = {
     "url":""
   };
