@@ -1,6 +1,6 @@
 # screenshot-website
 
-Electron-js tool to take a full site screenshot
+Electron-js tool to take a full webpage screenshot
 
 ## Installation
 
