@@ -9,9 +9,11 @@
   "author": "Juan Francisco Kurucz",
   "license": "ISC",
   "dependencies": {
+    "canvas": "^2.3.1",
     "electron": "^4.0.4",
     "get-pixels": "^3.3.2",
     "gif-encoder": "^0.7.2",
+    "gifencoder": "^2.0.1",
     "image-size": "^0.7.2",
     "pdf-poppler": "^0.2.1"
   }

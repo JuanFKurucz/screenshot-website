@@ -1,30 +1,32 @@
 const getPixels = require("get-pixels")
-const GifEncoder = require("gif-encoder");
+const GIFEncoder = require("gifencoder");
 const sizeOf = require("image-size");
 const fs = require("fs");
+const { createCanvas, loadImage } = require('canvas');
 
-const addToGif = (gif, images, counter = 0) => {
-  getPixels(images[counter], function(err, pixels) {
-    gif.addFrame(pixels.data);
-    gif.read();
+const addToGif = (encoder, ctx, dimensions, images, counter = 0) => {
+  loadImage(images[counter]).then((image) => {
+    ctx.drawImage(image, 0, 0, dimensions.width, dimensions.height);
+    encoder.addFrame(ctx);
     if (counter === images.length - 1) {
-      gif.finish();
+      encoder.finish();
     } else {
-      addToGif(gif, images, ++counter);
+      addToGif(encoder, ctx, dimensions, images, ++counter);
     }
-  })
+  });
 }
 
-const start = () => {
-  const outputFolder = __dirname+"/output/";
+const start = async () => {
+  const outputFolder = "./output/";
   if (fs.existsSync(outputFolder)) {
     if (!fs.existsSync(__dirname+"/gif/")) {
       fs.mkdirSync(__dirname+"/gif/");
     }
     const data = {
       "prefix":"",
-      "quality":100,
-      "delay":250
+      "quality":10,
+      "delay":250,
+      "repeat":0
     };
 
     process.argv.forEach(function (val, index, array) {
@@ -46,14 +48,20 @@ const start = () => {
     });
 
     if(pics.length){
-      const gif = new GifEncoder(dimensions.width, dimensions.height);
+      const encoder = new GIFEncoder(dimensions.width, dimensions.height);
       const d = new Date();
       const file = fs.createWriteStream(__dirname+"/gif/"+data["prefix"]+"-"+d.getTime()+".gif");
-      gif.pipe(file);
-      gif.setQuality(data["quality"]);
-      gif.setDelay(data["delay"]);
-      gif.writeHeader();
-      addToGif(gif, pics);
+      encoder.createReadStream().pipe(file);
+
+      encoder.start();
+      encoder.setRepeat(data["repeat"]);
+      encoder.setQuality(data["quality"]);
+      encoder.setDelay(data["delay"]);
+
+      const canvas = createCanvas(dimensions.width, dimensions.height);
+      const ctx = canvas.getContext('2d');
+      addToGif(encoder, ctx, dimensions, pics);
+      console.log("Finished");
     } else {
       console.log("There are no images with that prefix");
     }
