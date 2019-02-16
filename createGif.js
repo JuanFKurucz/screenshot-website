@@ -40,6 +40,25 @@ const start = async () => {
       }
     });
 
+    if(isNaN(data["quality"])){
+      data["quality"]=10;
+    }
+    if(isNaN(data["delay"])){
+      data["delay"]=250;
+    }
+    if(isNaN(data["x"])){
+      data["x"]=0;
+    }
+    if(isNaN(data["y"])){
+      data["y"]=0;
+    }
+    if(isNaN(data["width"])){
+      data["width"]=0;
+    }
+    if(isNaN(data["height"])){
+      data["height"]=0;
+    }
+
     let pics = [];
     let dimensions = null;
     fs.readdirSync(outputFolder).forEach(file => {
