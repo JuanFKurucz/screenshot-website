@@ -1,6 +1,5 @@
 const { app, BrowserWindow } = require("electron");
 const fs = require("fs");
-const pdf = require('pdf-poppler');
 
 let win;
 
@@ -10,21 +9,6 @@ const closeAndClean = () => {
     app.quit();
   });
 }
-
-const convertPdf = (file,url) => {
-  var regex = /(?:[\w-]+\.)+[\w-]+/;
-  const d = new Date();
-  let opts = {
-    format: 'jpeg',
-    out_dir: __dirname+"/output/",
-    out_prefix: regex.exec(url)+"-"+d.getTime(),
-    page: null
-  };
-  pdf.convert(file, opts).finally(()=>{
-    fs.unlinkSync(file);
-    closeAndClean();
-  })
-};
 
 const start = () => {
   if (!fs.existsSync(__dirname+"/tmp/")) {
@@ -51,18 +35,16 @@ const start = () => {
 };
 
 const createWindow = (url) => {
-  win = new BrowserWindow({ width: 800, height: 600 });
-  win.loadURL(url);
-  const pdfFile = __dirname+"/tmp/print.pdf";
-  win.webContents.on("did-finish-load", () => {
-    win.webContents.printToPDF({}, (error, data) => {
-      if (error) throw error;
-      fs.writeFile(pdfFile, data, (error) => {
-        if (error) throw error;
-        convertPdf(pdfFile,url);
-      });
-    });
+  win = new BrowserWindow({
+    width: 800,
+    height: 600,
+    webPreferences:{
+      preload:__dirname+"/script.js",
+      webSecurity:false,
+      allowRunningInsecureContent:true
+    }
   });
+  win.loadURL(url);
   win.on("closed", () => {
     win = null;
   });
