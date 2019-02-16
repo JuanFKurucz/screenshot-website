@@ -4,14 +4,14 @@ const sizeOf = require("image-size");
 const fs = require("fs");
 const { createCanvas, loadImage } = require('canvas');
 
-const addToGif = (encoder, ctx, dimensions, images, counter = 0) => {
+const addToGif = (cutting, encoder, ctx, dimensions, images, counter = 0) => {
   loadImage(images[counter]).then((image) => {
-    ctx.drawImage(image, 0, 0, dimensions.width, dimensions.height);
+    ctx.drawImage(image, cutting.x, cutting.y, dimensions.width, dimensions.height, 0, 0, dimensions.width, dimensions.height);
     encoder.addFrame(ctx);
     if (counter === images.length - 1) {
       encoder.finish();
     } else {
-      addToGif(encoder, ctx, dimensions, images, ++counter);
+      addToGif(cutting, encoder, ctx, dimensions, images, ++counter);
     }
   });
 }
@@ -26,7 +26,11 @@ const start = async () => {
       "prefix":"",
       "quality":10,
       "delay":250,
-      "repeat":0
+      "repeat":0,
+      "x":0,
+      "y":0,
+      "width":0,
+      "height":0
     };
 
     process.argv.forEach(function (val, index, array) {
@@ -48,7 +52,17 @@ const start = async () => {
     });
 
     if(pics.length){
-      const encoder = new GIFEncoder(dimensions.width, dimensions.height);
+      let realDimensions = {
+        width:dimensions.width,
+        height:dimensions.height
+      };
+      if(data["width"]!==0){
+        realDimensions.width = parseInt(data["width"]);
+      }
+      if(data["height"]!==0){
+        realDimensions.height = parseInt(data["height"]);
+      }
+      const encoder = new GIFEncoder(realDimensions.width, realDimensions.height);
       const d = new Date();
       const file = fs.createWriteStream(__dirname+"/gif/"+data["prefix"]+"-"+d.getTime()+".gif");
       encoder.createReadStream().pipe(file);
@@ -58,9 +72,14 @@ const start = async () => {
       encoder.setQuality(data["quality"]);
       encoder.setDelay(data["delay"]);
 
-      const canvas = createCanvas(dimensions.width, dimensions.height);
+      const canvas = createCanvas(realDimensions.width, realDimensions.height);
       const ctx = canvas.getContext('2d');
-      addToGif(encoder, ctx, dimensions, pics);
+
+      const cutting = {
+        x:parseInt(data["x"]),
+        y:parseInt(data["y"])
+      }
+      addToGif(cutting, encoder, ctx, realDimensions, pics);
       console.log("Finished");
     } else {
       console.log("There are no images with that prefix");
