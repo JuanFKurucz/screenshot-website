@@ -17,28 +17,32 @@ const addToGif = (cutting, encoder, ctx, dimensions, images, counter = 0) => {
 }
 
 const start = async () => {
-  const outputFolder = "./output/";
-  if (fs.existsSync(outputFolder)) {
-    if (!fs.existsSync(__dirname+"/gif/")) {
-      fs.mkdirSync(__dirname+"/gif/");
-    }
-    const data = {
-      "prefix":"",
-      "quality":10,
-      "delay":250,
-      "repeat":0,
-      "x":0,
-      "y":0,
-      "width":0,
-      "height":0
-    };
 
-    process.argv.forEach(function (val, index, array) {
-      const d=val.split("=");
-      if(d.length==2 && data.hasOwnProperty(d[0].toLowerCase())){
-        data[d[0].toLowerCase()]=d[1];
-      }
-    });
+  const data = {
+    "prefix":"",
+    "quality":10,
+    "delay":250,
+    "repeat":0,
+    "x":0,
+    "y":0,
+    "width":0,
+    "height":0,
+    "from":"./output/",
+    "to":"./gif/"
+  };
+  process.argv.forEach(function (val, index, array) {
+    const d=val.split("=");
+    if(d.length==2 && data.hasOwnProperty(d[0].toLowerCase())){
+      data[d[0].toLowerCase()]=d[1];
+    }
+  });
+  console.log(data);
+  if (fs.existsSync(data.from)) {
+    if (!fs.existsSync(data.to)) {
+      fs.mkdirSync(data.to);
+    }
+
+
 
     if(isNaN(data["quality"])){
       data["quality"]=10;
@@ -61,11 +65,11 @@ const start = async () => {
 
     let pics = [];
     let dimensions = null;
-    fs.readdirSync(outputFolder).forEach(file => {
+    fs.readdirSync(data.from).forEach(file => {
       if(file.indexOf(data["prefix"])===0){
-        pics.push(outputFolder+file);
+        pics.push(data.from+file);
         if(dimensions === null){
-          dimensions = sizeOf(outputFolder+file);
+          dimensions = sizeOf(data.from+file);
         }
       }
     });
@@ -83,7 +87,7 @@ const start = async () => {
       }
       const encoder = new GIFEncoder(realDimensions.width, realDimensions.height);
       const d = new Date();
-      const file = fs.createWriteStream(__dirname+"/gif/"+data["prefix"]+"-"+d.getTime()+".gif");
+      const file = fs.createWriteStream(data.to+"\\"+data["prefix"]+"-"+d.getTime()+".gif");
       encoder.createReadStream().pipe(file);
 
       encoder.start();
