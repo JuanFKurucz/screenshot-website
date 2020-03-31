@@ -12,10 +12,7 @@ const closeAndClean = () => {
 };
 
 const start = () => {
-  baseFolder = path.resolve(__dirname, "..");
-  if (!fs.existsSync(baseFolder + "/tmp/")) {
-    fs.mkdirSync(baseFolder + "/tmp/");
-  }
+  const baseFolder = path.resolve(__dirname, "..");
   if (!fs.existsSync(baseFolder + "/output/")) {
     fs.mkdirSync(baseFolder + "/output/");
   }

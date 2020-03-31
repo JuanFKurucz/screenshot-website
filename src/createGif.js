@@ -1,4 +1,3 @@
-const getPixels = require("get-pixels");
 const GIFEncoder = require("gifencoder");
 const sizeOf = require("image-size");
 const fs = require("fs");
